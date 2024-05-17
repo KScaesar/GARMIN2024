@@ -1,7 +1,21 @@
 # README
 
-## services
+## api
 
+```bash
+curl -X POST http://localhost:8168/api/v1/orders \
+     -H "Content-Type: application/json" \
+     -d '{
+           "customer_name": "caesar",
+           "total_price": 27000
+         }'
+```
+
+## service
+
+- app_server:  
+    <localhost:8168>
+    
 - prometheus:  
     <localhost:9090>
     

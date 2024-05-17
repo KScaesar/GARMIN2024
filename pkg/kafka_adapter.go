@@ -1,7 +1,8 @@
-package infra
+package pkg
 
 import (
 	"context"
+	"time"
 
 	"github.com/KScaesar/art"
 	"github.com/segmentio/kafka-go"
@@ -22,16 +23,37 @@ func PingKafka(urls []string) error {
 	return nil
 }
 
-func GeneralKafkaWriter(urls []string) *kafka.Writer {
+func CreateKafkaTopic(url string, topics []string) error {
+	conn, err := kafka.Dial("tcp", url)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	conf := []kafka.TopicConfig{}
+	for _, topic := range topics {
+		conf = append(conf, kafka.TopicConfig{
+			Topic:              topic,
+			NumPartitions:      3,
+			ReplicationFactor:  2,
+			ReplicaAssignments: nil,
+			ConfigEntries:      nil,
+		})
+	}
+	return conn.CreateTopics(conf...)
+}
+
+func NormalKafkaWriter(urls []string, batchTimeout time.Duration) *kafka.Writer {
 	writer := &kafka.Writer{
 		Addr:                   kafka.TCP(urls...),
 		Balancer:               &kafka.Hash{},
+		BatchTimeout:           batchTimeout,
 		AllowAutoTopicCreation: true,
 	}
 	return writer
 }
 
-func GeneralKafkaGroupReader(urls []string, groupId string, topics []string) *kafka.Reader {
+func NormalKafkaGroupReader(urls []string, groupId string, topics []string) *kafka.Reader {
 	return kafka.NewReader(kafka.ReaderConfig{
 		Brokers:     urls,
 		GroupID:     groupId,
@@ -75,7 +97,7 @@ func (f KafkaFactory) CreateProducer() (producer KafkaProducer, err error) {
 	opt.RawStop(func(logger art.Logger) (err error) {
 		err = f.Writer.Close()
 		if err != nil {
-			logger.Error("writer stop: %v", err)
+			logger.Error("kafka writer stop: %v", err)
 			return
 		}
 		return nil
@@ -101,16 +123,16 @@ func (f KafkaFactory) CreateConsumer() (consumer KafkaConsumer, err error) {
 	opt.RawRecv(func(logger art.Logger) (message *art.Message, err error) {
 		kafkaMessage, err := f.Reader.FetchMessage(context.Background())
 		if err != nil {
-			logger.Error("recv: %v", err)
+			logger.Error("kafka recv: %v", err)
 			return nil, err
 		}
-		return NewKafkaIngress(&kafkaMessage), nil
+		return kafkaIngress(kafkaMessage), nil
 	})
 
 	opt.RawStop(func(logger art.Logger) (err error) {
 		err = f.Reader.Close()
 		if err != nil {
-			logger.Error("reader stop: %v", err)
+			logger.Error("kafka reader stop: %v", err)
 			return
 		}
 		return nil

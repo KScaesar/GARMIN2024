@@ -1,6 +1,8 @@
 package pkg
 
 type Config struct {
-	HttpPort  string
-	KafkaUrls []string
+	Production bool
+	HttpPort   string
+	GinDebug   bool
+	KafkaUrls  []string
 }
