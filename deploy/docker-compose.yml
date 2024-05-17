@@ -1,0 +1,141 @@
+services:
+
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 18080:8080
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+    volumes:
+      - ./kafka-ui-config.yaml:/etc/kafkaui/dynamic_config.yaml
+    networks:
+      - GARMIN_network
+    depends_on:
+      - kafka0
+      - kafka1
+      - kafka2
+
+  kafka0:
+    # https://github.com/apache/kafka/blob/trunk/config/kraft/server.properties
+    # https://docs.confluent.io/platform/current/kafka-metadata/config-kraft.html#configuration-options
+
+    image: 'bitnami/kafka:3.5.1'
+    hostname: kafka0.local
+    container_name: kafka0
+    restart: always
+    environment:
+      - KAFKA_MOUNTED_CONF_DIR=/bitnami/kafka/config/
+      - KAFKA_KRAFT_CLUSTER_ID=abcdefghijklmnopqrstuv
+    ports:
+      - '19092:19092'   # external
+    volumes:
+      - ./kafka0.properties:/bitnami/kafka/config/server.properties
+      - kafka0_data:/bitnami/kafka/data
+    networks:
+      - GARMIN_network
+
+  kafka1:
+    image: 'bitnami/kafka:3.5.1'
+    hostname: kafka1.local
+    container_name: kafka1
+    restart: always
+    environment:
+      - KAFKA_MOUNTED_CONF_DIR=/bitnami/kafka/config/
+      - KAFKA_KRAFT_CLUSTER_ID=abcdefghijklmnopqrstuv
+    ports:
+      - '19093:19093'   # external
+    volumes:
+      - ./kafka1.properties:/bitnami/kafka/config/server.properties
+      - kafka1_data:/bitnami/kafka/data
+    networks:
+      - GARMIN_network
+
+  kafka2:
+    image: 'bitnami/kafka:3.5.1'
+    hostname: kafka2.local
+    container_name: kafka2
+    restart: always
+    environment:
+      - KAFKA_MOUNTED_CONF_DIR=/bitnami/kafka/config/
+      - KAFKA_KRAFT_CLUSTER_ID=abcdefghijklmnopqrstuv
+    ports:
+      - '19094:19094'   # external
+    volumes:
+      - ./kafka2.properties:/bitnami/kafka/config/server.properties
+      - kafka2_data:/bitnami/kafka/data
+    networks:
+      - GARMIN_network
+
+
+  prometheus:
+    # https://github.com/bitnami/containers/tree/main/bitnami/prometheus
+
+    # https://github.com/prometheus/prometheus/blob/main/documentation/examples/prometheus.yml
+    # https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+    # https://prometheus.io/docs/guides/file-sd/#use-file-based-service-discovery-to-discover-scrape-targets
+
+    image: bitnami/prometheus:2.52.0
+    container_name: prometheus
+    hostname: prometheus.local
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Taipei
+    ports:
+      - 9090:9090
+    volumes:
+      - prometheus_data:/opt/bitnami/prometheus/data
+      - ./prometheus.yml:/opt/bitnami/prometheus/conf/prometheus.yml
+
+    networks:
+      - GARMIN_network
+  #    network_mode: "host"
+
+
+  grafana:
+    # https://grafana.com/docs/grafana/latest/setup-grafana/start-restart-grafana/#docker-compose-example
+    # https://grafana.com/docs/grafana/latest/setup-grafana/installation/docker/
+    # https://grafana.com/docs/grafana/latest/setup-grafana/configure-docker/#default-paths
+    # https://grafana.com/docs/grafana/latest/administration/provisioning/#data-sources
+
+    # https://github.com/grafana/grafana/blob/main/conf/defaults.ini
+    # https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/
+    # https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/#override-configuration-with-environment-variables
+
+    image: grafana/grafana:10.4.3-ubuntu
+    container_name: grafana
+    hostname: grafana.local
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Taipei
+      - GF_INSTALL_PLUGINS=grafana-clock-panel
+      - GF_SECURITY_ADMIN_USER=root
+      - GF_SECURITY_ADMIN_PASSWORD=1234
+    ports:
+      - '3000:3000'
+    volumes:
+      - 'grafana_data:/var/lib/grafana'
+
+    networks:
+      - GARMIN_network
+#    network_mode: "host"
+
+volumes:
+  grafana_data:
+    name: grafana_data
+
+  prometheus_data:
+    name: prometheus_data
+
+  kafka0_data:
+    name: kafka0_data
+  kafka1_data:
+    name: kafka1_data
+  kafka2_data:
+    name: kafka2_data
+
+networks:
+  GARMIN_network:
+    name: GARMIN_network
+    driver: bridge
