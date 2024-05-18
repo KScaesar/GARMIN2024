@@ -35,7 +35,7 @@ func kafkaIngressMux(svc *app.Service) *pkg.KafkaIngressMux {
 			art.UseLogger(false, art.SafeConcurrency_Skip),
 			art.UseAdHocFunc(func(message *art.Message, dep any) error {
 				logger := art.CtxGetLogger(message.Ctx)
-				logger.Info("recv %q", message.Subject)
+				logger.Info("kafka recv %q", message.Subject)
 				return nil
 			}).PreMiddleware(),
 			pkg.UseCommitKafkaWhenHandleOk(),

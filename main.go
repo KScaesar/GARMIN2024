@@ -12,21 +12,20 @@ import (
 )
 
 func main() {
-	conf := &pkg.Config{
-		Production: false,
-		HttpPort:   "8168",
-		GinDebug:   false,
-		KafkaUrls:  []string{"localhost:19092", "localhost:19093", "localhost:19094"},
-	}
 	art.SetDefaultLogger(art.NewLogger(false, art.LogLevelDebug))
 	logger := art.DefaultLogger()
 
-	err := pkg.PingKafka(conf.KafkaUrls)
+	conf, err := pkg.LoadJsonConfingByLocal("")
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
 
-	producer, err := pubsub.NormalKafkaProducer(conf)
+	err = pkg.PingKafka(conf.KafkaUrls)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
+	producer, err := pubsub.NormalKafkaProducer(&conf)
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
@@ -36,8 +35,8 @@ func main() {
 		ShippingService: app.NewShippingUseCase(),
 	}
 
-	router := api.NewGinRouter(conf, svc)
-	httpServer := api.NewHttpServer(conf, router)
+	router := api.NewGinRouter(&conf, svc)
+	httpServer := api.NewHttpServer(&conf, router)
 	go func() {
 		err := httpServer.ListenAndServe()
 		if err != nil {
@@ -45,7 +44,7 @@ func main() {
 		}
 	}()
 
-	consumer, err := pubsub.NormalKafkaConsumer(conf, svc)
+	consumer, err := pubsub.NormalKafkaConsumer(&conf, svc)
 	if err != nil {
 		logger.Fatal(err.Error())
 	}

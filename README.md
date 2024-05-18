@@ -13,6 +13,10 @@ curl -X POST http://localhost:8168/api/v1/orders \
 
 ## service
 
+```bash
+cd ./deploy && docker compose up -d
+```
+
 - app_server:  
     <localhost:8168>
     
@@ -26,3 +30,10 @@ curl -X POST http://localhost:8168/api/v1/orders \
     
 -  kafka-ui:  
     <localhost:18080>
+      
+## Dockerfile
+
+```bash
+docker build -f Dockerfile -t x246libra/garmin2024:v0.1.0 . && \
+    docker rmi `docker images --filter label=stage=builder -q`
+```
