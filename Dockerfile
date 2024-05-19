@@ -21,5 +21,10 @@ COPY ./configs/container.json ./configs/container.json
 
 ENV CONF_PATH="/app/configs/container.yaml"
 
+# app server
 EXPOSE 8168
+
+# metirc
+EXPOSE 2112
+
 CMD ["./server"]

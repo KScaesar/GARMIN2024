@@ -2,5 +2,13 @@
   "Production": false,
   "HttpPort": "8168",
   "GinDebug": false,
-  "KafkaUrls": ["kafka0.local:9092", "kafka1.local:9092", "kafka2.local:9092"]
+  "KafkaUrls": [
+    "kafka0.local:9092",
+    "kafka1.local:9092",
+    "kafka2.local:9092"
+  ],
+  "O11Y": {
+    "Enable": true,
+    "MetricPort": "2112"
+  }
 }

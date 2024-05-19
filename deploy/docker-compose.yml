@@ -25,7 +25,7 @@ services:
 
 
   app0:
-    image: "x246libra/garmin2024:v0.1.0"
+    image: "x246libra/garmin2024:v0.2.0"
     hostname: app0.local
     container_name: garmin2024_app0
     restart: always
@@ -39,7 +39,7 @@ services:
     networks:
       - GARMIN_network
   app1:
-    image: "x246libra/garmin2024:v0.1.0"
+    image: "x246libra/garmin2024:v0.2.0"
     hostname: app1.local
     container_name: garmin2024_app1
     restart: always
@@ -51,7 +51,7 @@ services:
     networks:
       - GARMIN_network
   app2:
-    image: "x246libra/garmin2024:v0.1.0"
+    image: "x246libra/garmin2024:v0.2.0"
     hostname: app2.local
     container_name: garmin2024_app2
     restart: always

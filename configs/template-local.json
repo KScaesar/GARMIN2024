@@ -2,5 +2,13 @@
   "Production": false,
   "HttpPort": "18168",
   "GinDebug": false,
-  "KafkaUrls": ["localhost:19092", "localhost:19093", "localhost:19094"]
+  "KafkaUrls": [
+    "localhost:19092",
+    "localhost:19093",
+    "localhost:19094"
+  ],
+  "O11Y": {
+    "Enable": false,
+    "MetricPort": "2112"
+  }
 }

@@ -1,18 +1,17 @@
 # README
 
-- [README](#readme)
-    - [system architecture](#system-architecture)
-        - [data flow =\> `a` flow](#data-flow--a-flow)
-        - [monitor flow =\> `x, y, z` flow](#monitor-flow--x-y-z-flow)
-    - [data flow](#data-flow)
-    - [software architecture](#software-architecture)
-        - [adapters](#adapters)
-            - [api](#api)
-            - [pubsub](#pubsub)
-        - [app](#app)
-    - [create data](#create-data)
-    - [service](#service)
-    - [Dockerfile](#dockerfile)
+- [system architecture](#system-architecture)
+  - [data flow =\> `a` flow](#data-flow--a-flow)
+  - [monitor flow =\> `x, y, z` flow](#monitor-flow--x-y-z-flow)
+- [software architecture](#software-architecture)
+  - [adapters](#adapters)
+    - [api](#api)
+    - [pubsub](#pubsub)
+  - [app](#app)
+- [create data](#create-data)
+- [service](#service)
+- [Dockerfile](#dockerfile)
+
 
 ## system architecture
 
@@ -35,18 +34,7 @@ iv.
 v.  
 produce evnet 加上 kafka key, 每筆特定的資料, 只會有單一消費者處理. 當多個消費者處理資料時, 也可以保證 message 的順序.
 
-### monitor flow => `x, y, z` flow
-
-i.  
-kafka 預期使用 Kafka Exporter, 由 prometheus pull metric
-
-ii.  
-app server 預期使用 第三方客戶端庫, 暴露 metric api, 由 prometheus pull metric
-
-iii.  
-grafana 讀取 prometheus, 進行 monitor 數值視覺化.
-
-## data flow
+vi.
 
 用戶利用 http 觸發 CreateOrderCommand, 產生 CreatedOrderEvent
 
@@ -56,6 +44,52 @@ grafana 讀取 prometheus, 進行 monitor 數值視覺化.
 `when 訂單被創建, then 進行運輸作業`
 
 ![data_flow](asset/data_flow.png)
+
+### monitor flow => `x, y, z` flow
+
+i.  
+kafka 預期使用 Kafka Exporter, 由 prometheus pull metric
+
+ii.  
+app server, 暴露 metric endpoint, 由 prometheus pull metric
+
+iii.  
+grafana 讀取 prometheus, 進行 monitor 數值視覺化.
+
+iv.  
+簡單列出 key metric.
+
+**rps**  
+```
+# by instance
+rate(http_requests_total{job="garmin2024"}[1m])
+
+# total instance
+sum(rate(http_requests_total{job="garmin2024"}[1m]))
+```
+
+**response time 中位數 P99, P50**  
+```
+label_replace(histogram_quantile(0.99, sum(rate(http_response_milliseconds_bucket{job="garmin2024"}[1m])) by (le)), "Percentile", "P99", "", "") or
+
+label_replace(histogram_quantile(0.50, sum(rate(http_response_milliseconds_bucket{job="garmin2024"}[1m])) by (le)), "Percentile", "P50", "", "")
+```
+
+![grafana](asset/grafana.png)
+
+**成功率**  
+```
+(
+  sum(http_requests_total{job="garmin2024", status=~"2.."}) 
+  /
+  sum(http_requests_total{job="garmin2024"})
+) * 100
+```
+
+**失敗次數**  
+```
+http_requests_total{job="garmin2024", status=~"4..|5.."}
+```
 
 ## software architecture
 
@@ -87,6 +121,7 @@ grafana 讀取 prometheus, 進行 monitor 數值視覺化.
 
 ## create data
 
+one-time
 ```bash
 curl -X POST http://localhost:8168/api/v1/orders \
      -H "Content-Type: application/json" \
@@ -94,6 +129,22 @@ curl -X POST http://localhost:8168/api/v1/orders \
            "customer_name": "caesar",
            "total_price": 27000
          }'
+```
+
+repeat
+```bash
+URL="http://localhost:8168/api/v1/orders"
+DATA='{
+  "customer_name": "caesar",
+  "total_price": 27000
+}'
+
+while true; do
+  curl -X POST "$URL" \
+       -H "Content-Type: application/json" \
+       -d "$DATA"
+  sleep 1
+done
 ```
 
 ## service
@@ -113,7 +164,8 @@ cd ./deploy && docker compose up -d
 - grafana:  
   <localhost:3000>  
   user: `root`  
-  pw: `1234`
+  pw: `1234`  
+  prometheus URL: `http://prometheus.local:9090/`  
 
 - kafka-ui:  
   <localhost:18080>
@@ -121,6 +173,10 @@ cd ./deploy && docker compose up -d
 ## Dockerfile
 
 ```bash
-docker build -f Dockerfile -t x246libra/garmin2024:v0.1.0 . && \
+docker build -f Dockerfile -t x246libra/garmin2024:v0.2.0 . && \
     docker rmi `docker images --filter label=stage=builder -q`
+```
+
+```bash
+docker push x246libra/garmin2024:v0.2.0
 ```

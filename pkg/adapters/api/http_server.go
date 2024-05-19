@@ -28,8 +28,14 @@ func NewGinRouter(conf *pkg.Config, svc *app.Service) *gin.Engine {
 	}
 	router.Use(gin.Recovery())
 
-	router.Group("api/v1/").
-		POST("orders", createOrder(svc))
+	v1 := router.Group("api/v1/")
+
+	if conf.O11Y.Enable {
+		o11y := NewO11Y()
+		v1.Use(o11y.Middleware("v1"))
+	}
+
+	v1.POST("orders", createOrder(svc))
 
 	return router
 }
