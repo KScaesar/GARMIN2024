@@ -1,18 +1,18 @@
 # README
 
 - [README](#readme)
-  - [system architecture](#system-architecture)
-    - [data flow =\> `a` flow](#data-flow--a-flow)
-    - [monitor flow =\> `x, y, z` flow](#monitor-flow--x-y-z-flow)
-  - [data flow](#data-flow)
-  - [software architecture](#software-architecture)
-    - [adapters](#adapters)
-      - [api](#api)
-      - [pubsub](#pubsub)
-    - [app](#app)
-  - [create data](#create-data)
-  - [service](#service)
-  - [Dockerfile](#dockerfile)
+    - [system architecture](#system-architecture)
+        - [data flow =\> `a` flow](#data-flow--a-flow)
+        - [monitor flow =\> `x, y, z` flow](#monitor-flow--x-y-z-flow)
+    - [data flow](#data-flow)
+    - [software architecture](#software-architecture)
+        - [adapters](#adapters)
+            - [api](#api)
+            - [pubsub](#pubsub)
+        - [app](#app)
+    - [create data](#create-data)
+    - [service](#service)
+    - [Dockerfile](#dockerfile)
 
 ## system architecture
 
@@ -21,39 +21,39 @@
 ### data flow => `a` flow
 
 i.  
-kafka 每個 topic 有 3 個 partition.  
+kafka 每個 topic 有 3 個 partition.
 
 ii.  
-3 個 app server 同時為 api server, kafka producer, kafka consumer. 搭配 partition 可以加速發布 message 及消費 message 的速度.  
+3 個 app server 同時為 api server, kafka producer, kafka consumer. 搭配 partition 可以加速發布 message 及消費 message 的速度.
 
 iii.  
-app server 和 kafka 都有多個節點, 具有 ha 效果.  
+app server 和 kafka 都有多個節點, 具有 ha 效果.
 
 iv.  
 3 個 app server 組成一個 kafka consumer group, 精確分配 kafka partition.
 
 v.  
-produce evnet 加上 kafka key, 每筆特定的資料, 只會有單一消費者處理. 當多個消費者處理資料時, 也可以保證 message 的順序.  
+produce evnet 加上 kafka key, 每筆特定的資料, 只會有單一消費者處理. 當多個消費者處理資料時, 也可以保證 message 的順序.
 
 ### monitor flow => `x, y, z` flow
 
 i.  
-kafka 預期使用 Kafka Exporter 發送 metric 給 prometheus
+kafka 預期使用 Kafka Exporter, 由 prometheus pull metric
 
 ii.  
-app server 預期使用 第三方客戶端庫, 主動推送 api endpoint 服務狀態
+app server 預期使用 第三方客戶端庫, 暴露 metric api, 由 prometheus pull metric
 
 iii.  
 grafana 讀取 prometheus, 進行 monitor 數值視覺化.
 
 ## data flow
 
-用戶利用 http 觸發 CreateOrderCommand, 產生 CreatedOrderEvent  
+用戶利用 http 觸發 CreateOrderCommand, 產生 CreatedOrderEvent
 
-發布事件到外部系統 shipping service, 利用 kafka 消費事件, 進行 CreateShipping  
+發布事件到外部系統 shipping service, 利用 kafka 消費事件, 進行 CreateShipping
 
 簡單一句話說明業務流程:  
-`when 訂單被創建, then 進行運輸作業`  
+`when 訂單被創建, then 進行運輸作業`
 
 ![data_flow](asset/data_flow.png)
 
@@ -74,7 +74,6 @@ grafana 讀取 prometheus, 進行 monitor 數值視覺化.
 負責處理應用程式對外的 API 接口。
 
 接收外部請求並將其轉換為應用程式可以理解的 command 或 query 。
-
 
 #### pubsub
 
@@ -105,21 +104,20 @@ cd ./deploy && docker compose up -d
 
 [docker-compose.yml](deploy/docker-compose.yml)
 
-
 - app_server:  
-    <localhost:8168>
-    
+  <localhost:8168>
+
 - prometheus:  
-    <localhost:9090>
-    
+  <localhost:9090>
+
 - grafana:  
-    <localhost:3000>  
-    user: `root`  
-    pw: `1234`
-    
--  kafka-ui:  
-    <localhost:18080>
-      
+  <localhost:3000>  
+  user: `root`  
+  pw: `1234`
+
+- kafka-ui:  
+  <localhost:18080>
+
 ## Dockerfile
 
 ```bash
