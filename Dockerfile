@@ -13,6 +13,7 @@ RUN go mod download && CGO_ENABLED=0 go build -trimpath -o ./server ./main.go
 # Second stage: Copy the binary from the builder stage and run it
 FROM alpine:latest
 
+RUN apk add --no-cache tzdata
 WORKDIR /app
 
 COPY --from=builder /build/server .
