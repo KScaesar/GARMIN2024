@@ -1,4 +1,4 @@
-package api
+package pkg
 
 import (
 	"context"
@@ -10,15 +10,20 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
+type O11YConfig struct {
+	Enable     bool
+	MetricPort string
+}
+
 func NewO11Y() *O11Y {
 	o11y := &O11Y{
-		ResponseMilliSeconds: promauto.NewHistogramVec(prometheus.HistogramOpts{
+		HttpResponseMilliSeconds: promauto.NewHistogramVec(prometheus.HistogramOpts{
 			Name:    "http_response_milliseconds",
 			Help:    "Histogram of response times for api in milliseconds",
 			Buckets: []float64{10, 20, 50, 100, 300, 600, 1_000, 2_000, 5_000, 10_000, 30_000, 60_000}, // 10 ms ~ 60 s
 		}, []string{"version", "method", "path", "status"}),
 
-		RequestsTotal: promauto.NewCounterVec(prometheus.CounterOpts{
+		HttpRequestsTotal: promauto.NewCounterVec(prometheus.CounterOpts{
 			Name: "http_requests_total",
 			Help: "Total number of HTTP requests",
 		}, []string{"version", "method", "path", "status"}),
@@ -28,11 +33,11 @@ func NewO11Y() *O11Y {
 }
 
 type O11Y struct {
-	ResponseMilliSeconds *prometheus.HistogramVec
-	RequestsTotal        *prometheus.CounterVec
+	HttpResponseMilliSeconds *prometheus.HistogramVec
+	HttpRequestsTotal        *prometheus.CounterVec
 }
 
-func (o11y *O11Y) Middleware(version string) func(c *gin.Context) {
+func (o11y *O11Y) GinMiddleware(version string) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		ctx := CtxWithO11Y(c.Request.Context(), o11y)
 		c.Request = c.Request.WithContext(ctx)
@@ -47,8 +52,8 @@ func (o11y *O11Y) Middleware(version string) func(c *gin.Context) {
 		duration := time.Since(start).Seconds() * 1000 // convert ms
 		status := strconv.Itoa(c.Writer.Status())
 
-		o11y.ResponseMilliSeconds.WithLabelValues(version, method, path, status).Observe(duration)
-		o11y.RequestsTotal.WithLabelValues(version, method, path, status).Inc()
+		o11y.HttpResponseMilliSeconds.WithLabelValues(version, method, path, status).Observe(duration)
+		o11y.HttpRequestsTotal.WithLabelValues(version, method, path, status).Inc()
 	}
 }
 

@@ -15,12 +15,7 @@ type Config struct {
 	HttpPort   string
 	GinDebug   bool
 	KafkaUrls  []string
-	O11Y       O11Y
-}
-
-type O11Y struct {
-	Enable     bool
-	MetricPort string
+	O11Y       O11YConfig
 }
 
 //

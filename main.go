@@ -67,7 +67,11 @@ func main() {
 		Serve(ctx)
 }
 
-func ServeO11Y(conf *pkg.O11Y) {
+func ServeO11Y(conf *pkg.O11YConfig) {
+	if !conf.Enable {
+		return
+	}
+
 	http.DefaultServeMux.Handle("/metrics", promhttp.Handler())
 	go func() {
 		http.ListenAndServe(":"+conf.MetricPort, http.DefaultServeMux)
