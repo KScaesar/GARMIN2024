@@ -173,9 +173,9 @@ cd ./deploy && docker compose up -d
 ## Dockerfile
 
 ```bash
-docker build -f Dockerfile -t x246libra/garmin2024:v0.4.1 .
+docker build -f Dockerfile -t x246libra/garmin2024:v0.4.2 .
 ```
 
 ```bash
-docker push x246libra/garmin2024:v0.4.1
+docker push x246libra/garmin2024:v0.4.2
 ```
