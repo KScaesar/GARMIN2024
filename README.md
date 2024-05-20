@@ -155,28 +155,27 @@ cd ./deploy && docker compose up -d
 
 [docker-compose.yml](deploy/docker-compose.yml)
 
-- app_server:  
-  <localhost:8168>
-
-- prometheus:  
-  <localhost:9090>
-
 - grafana:  
-  <localhost:3000>  
+  [http://localhost:3000](http://localhost:3000)    
   user: `root`  
   pw: `1234`  
-  prometheus URL: `http://prometheus.vLocal:9090/`  
+  prometheus URL: `http://prometheus.vHost:9090/`
+
+- prometheus:  
+  [http://localhost:9090](http://localhost:9090)  
 
 - kafka-ui:  
-  <localhost:18080>
+  [http://localhost:18080](http://localhost:18080)
+
+- app_server:  
+  localhost:8168  
 
 ## Dockerfile
 
 ```bash
-docker build -f Dockerfile -t x246libra/garmin2024:v0.4.0 . && \
-    docker rmi `docker images --filter label=stage=builder -q`
+docker build -f Dockerfile -t x246libra/garmin2024:v0.4.1 .
 ```
 
 ```bash
-docker push x246libra/garmin2024:v0.4.0
+docker push x246libra/garmin2024:v0.4.1
 ```

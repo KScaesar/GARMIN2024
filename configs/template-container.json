@@ -3,9 +3,9 @@
   "HttpPort": "8168",
   "GinDebug": false,
   "KafkaUrls": [
-    "kafka0.vLocal:9092",
-    "kafka1.vLocal:9092",
-    "kafka2.vLocal:9092"
+    "kafka0.vHost:9092",
+    "kafka1.vHost:9092",
+    "kafka2.vHost:9092"
   ],
   "O11Y": {
     "Enable": true,

@@ -9,7 +9,7 @@ scrape_configs:
   - job_name: "prometheus"
     scrape_interval: 5s
     static_configs:
-      - targets: [ "prometheus.vLocal:9090" ]
+      - targets: [ "prometheus.vHost:9090" ]
 
 #  - job_name: "node"
 #    static_configs:
@@ -19,4 +19,4 @@ scrape_configs:
     scrape_interval: 1s
     static_configs:
 #      - targets: [ "localhost:2112" ]
-      - targets: [ "app0.vLocal:2112","app1.vLocal:2112","app2.vLocal:2112" ]
+      - targets: [ "app0.vHost:2112","app1.vHost:2112","app2.vHost:2112" ]
