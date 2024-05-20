@@ -9,7 +9,7 @@ import (
 
 func NormalKafkaConsumer(conf *pkg.Config, svc *app.Service) (pkg.KafkaConsumer, error) {
 	err := pkg.CreateKafkaTopic(conf.KafkaUrls[0], []string{
-		app.Topic_V1_CreatedOrder,
+		app.Subject_V1_CreatedOrder,
 	})
 	if err != nil {
 		return nil, err
@@ -20,7 +20,7 @@ func NormalKafkaConsumer(conf *pkg.Config, svc *app.Service) (pkg.KafkaConsumer,
 		Reader: pkg.NormalKafkaGroupReader(
 			conf.KafkaUrls,
 			"v1.order",
-			[]string{app.Topic_V1_CreatedOrder},
+			[]string{app.Subject_V1_CreatedOrder},
 		),
 		IngressMux: kafkaIngressMux(svc),
 	}.CreateConsumer()
@@ -42,7 +42,7 @@ func kafkaIngressMux(svc *app.Service) *pkg.KafkaIngressMux {
 		)
 
 	mux.Group("v1.").
-		Handler(app.Topic_CreatedOrder, createShipping(svc))
+		Handler(app.Subject_CreatedOrder, createShipping(svc))
 
 	return mux
 }

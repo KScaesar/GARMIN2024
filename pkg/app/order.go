@@ -2,6 +2,8 @@ package app
 
 import (
 	"github.com/KScaesar/art"
+
+	"github.com/KScaesar/GARMIN2024/pkg"
 )
 
 // domain entity
@@ -18,7 +20,7 @@ func NewOrder(param *CreateOrderParam) (order *Order, event *art.Message) {
 		TotalPrice:   param.TotalPrice,
 	}
 
-	event = NewBodyEgress(Topic_V1_CreatedOrder, order)
+	event = pkg.NewBodyEgress(Subject_V1_CreatedOrder, order)
 	Metadata.SetOrderId(event, order.OrderId)
 
 	return order, event

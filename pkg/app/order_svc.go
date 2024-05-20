@@ -2,14 +2,16 @@ package app
 
 import (
 	"context"
+
+	"github.com/KScaesar/GARMIN2024/pkg"
 )
 
-func NewOrderUseCase(bus MessageBus) *OrderUseCase {
+func NewOrderUseCase(bus pkg.MessageBus) *OrderUseCase {
 	return &OrderUseCase{bus: bus}
 }
 
 type OrderUseCase struct {
-	bus MessageBus
+	bus pkg.MessageBus
 }
 
 func (uc *OrderUseCase) CreateOrder(ctx context.Context, req *CreateOrderParam) error {

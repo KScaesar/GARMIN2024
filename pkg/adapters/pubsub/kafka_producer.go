@@ -36,6 +36,6 @@ func kafkaEgressMux() *pkg.KafkaEgressMux {
 			pkg.UseEncodeJson(),
 			pkg.UseAutoCreateKafkaTopic(),
 		).
-		Handler(app.Topic_V1_CreatedOrder, pkg.UseKafkaWriter(createdOrder))
+		Handler(app.Subject_V1_CreatedOrder, pkg.UseKafkaWriter(createdOrder))
 	return mux
 }

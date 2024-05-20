@@ -11,7 +11,7 @@ func createdOrder(egress *art.Message, w *kafka.Writer) error {
 	orderId := app.Metadata.GetOrderId(egress)
 
 	return w.WriteMessages(egress.Ctx, kafka.Message{
-		Topic: app.Topic_V1_CreatedOrder,
+		Topic: app.Subject_V1_CreatedOrder,
 		Key:   []byte("OrderId=" + orderId),
 		Value: egress.Bytes,
 	})

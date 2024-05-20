@@ -1,11 +1,8 @@
-package app
+package pkg
 
 import (
 	"github.com/KScaesar/art"
 )
-
-var Topic_CreatedOrder = "Created.Order"
-var Topic_V1_CreatedOrder = "v1." + Topic_CreatedOrder
 
 type MessageBus interface {
 	Send(messages ...*art.Message) error
