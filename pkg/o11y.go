@@ -2,22 +2,19 @@ package pkg
 
 import (
 	"context"
+	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
-
-type O11YConfig struct {
-	Enable     bool
-	MetricPort string
-}
 
 func NewO11Y() *O11Y {
 	o11y := &O11Y{
-		HttpResponseMilliSeconds: promauto.NewHistogramVec(prometheus.HistogramOpts{
+		HttpResponseMilliseconds: promauto.NewHistogramVec(prometheus.HistogramOpts{
 			Name:    "http_response_milliseconds",
 			Help:    "Histogram of response times for api in milliseconds",
 			Buckets: []float64{10, 20, 50, 100, 300, 600, 1_000, 2_000, 5_000, 10_000, 30_000, 60_000}, // 10 ms ~ 60 s
@@ -33,7 +30,7 @@ func NewO11Y() *O11Y {
 }
 
 type O11Y struct {
-	HttpResponseMilliSeconds *prometheus.HistogramVec
+	HttpResponseMilliseconds *prometheus.HistogramVec
 	HttpRequestsTotal        *prometheus.CounterVec
 }
 
@@ -52,10 +49,12 @@ func (o11y *O11Y) GinMiddleware(version string) func(c *gin.Context) {
 		duration := time.Since(start).Seconds() * 1000 // convert ms
 		status := strconv.Itoa(c.Writer.Status())
 
-		o11y.HttpResponseMilliSeconds.WithLabelValues(version, method, path, status).Observe(duration)
+		o11y.HttpResponseMilliseconds.WithLabelValues(version, method, path, status).Observe(duration)
 		o11y.HttpRequestsTotal.WithLabelValues(version, method, path, status).Inc()
 	}
 }
+
+//
 
 var o11yKey = "o11y"
 
@@ -69,4 +68,22 @@ func CtxGetO11Y(ctx context.Context) (o11y *O11Y) {
 		return NewO11Y()
 	}
 	return o11y
+}
+
+//
+
+type O11YConfig struct {
+	Enable     bool
+	MetricPort string
+}
+
+func ServeO11Y(conf *O11YConfig) {
+	if !conf.Enable {
+		return
+	}
+
+	http.DefaultServeMux.Handle("/metrics", promhttp.Handler())
+	go func() {
+		http.ListenAndServe(":"+conf.MetricPort, http.DefaultServeMux)
+	}()
 }

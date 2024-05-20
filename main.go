@@ -2,10 +2,8 @@ package main
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/KScaesar/art"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/KScaesar/GARMIN2024/pkg"
 	"github.com/KScaesar/GARMIN2024/pkg/adapters/api"
@@ -54,7 +52,7 @@ func main() {
 		consumer.Listen()
 	}()
 
-	ServeO11Y(&conf.O11Y)
+	pkg.ServeO11Y(&conf.O11Y)
 
 	logger.Info("service started")
 	ctx := context.Background()
@@ -65,15 +63,4 @@ func main() {
 		StopService("kafka_p", producer.Stop).
 		StopService("kafka_c", consumer.Stop).
 		Serve(ctx)
-}
-
-func ServeO11Y(conf *pkg.O11YConfig) {
-	if !conf.Enable {
-		return
-	}
-
-	http.DefaultServeMux.Handle("/metrics", promhttp.Handler())
-	go func() {
-		http.ListenAndServe(":"+conf.MetricPort, http.DefaultServeMux)
-	}()
 }
