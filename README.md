@@ -173,10 +173,10 @@ cd ./deploy && docker compose up -d
 ## Dockerfile
 
 ```bash
-docker build -f Dockerfile -t x246libra/garmin2024:v0.2.0 . && \
+docker build -f Dockerfile -t x246libra/garmin2024:v0.3.0 . && \
     docker rmi `docker images --filter label=stage=builder -q`
 ```
 
 ```bash
-docker push x246libra/garmin2024:v0.2.0
+docker push x246libra/garmin2024:v0.3.0
 ```
