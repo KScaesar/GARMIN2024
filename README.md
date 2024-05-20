@@ -165,7 +165,7 @@ cd ./deploy && docker compose up -d
   <localhost:3000>  
   user: `root`  
   pw: `1234`  
-  prometheus URL: `http://prometheus.local:9090/`  
+  prometheus URL: `http://prometheus.vLocal:9090/`  
 
 - kafka-ui:  
   <localhost:18080>
@@ -173,10 +173,10 @@ cd ./deploy && docker compose up -d
 ## Dockerfile
 
 ```bash
-docker build -f Dockerfile -t x246libra/garmin2024:v0.3.0 . && \
+docker build -f Dockerfile -t x246libra/garmin2024:v0.4.0 . && \
     docker rmi `docker images --filter label=stage=builder -q`
 ```
 
 ```bash
-docker push x246libra/garmin2024:v0.3.0
+docker push x246libra/garmin2024:v0.4.0
 ```

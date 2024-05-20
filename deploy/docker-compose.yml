@@ -2,7 +2,7 @@ services:
 
   nginx:
     image: nginx:1.22.1
-    hostname: nginx.local
+    hostname: nginx.vLocal
     container_name: nginx
     restart: unless-stopped
     ports:
@@ -25,8 +25,8 @@ services:
 
 
   app0:
-    image: "x246libra/garmin2024:v0.3.0"
-    hostname: app0.local
+    image: "x246libra/garmin2024:v0.4.0"
+    hostname: app0.vLocal
     container_name: garmin2024_app0
     restart: always
     ports:
@@ -39,8 +39,8 @@ services:
     networks:
       - GARMIN_network
   app1:
-    image: "x246libra/garmin2024:v0.3.0"
-    hostname: app1.local
+    image: "x246libra/garmin2024:v0.4.0"
+    hostname: app1.vLocal
     container_name: garmin2024_app1
     restart: always
     environment:
@@ -51,8 +51,8 @@ services:
     networks:
       - GARMIN_network
   app2:
-    image: "x246libra/garmin2024:v0.3.0"
-    hostname: app2.local
+    image: "x246libra/garmin2024:v0.4.0"
+    hostname: app2.vLocal
     container_name: garmin2024_app2
     restart: always
     environment:
@@ -85,7 +85,7 @@ services:
     # https://docs.confluent.io/platform/current/kafka-metadata/config-kraft.html#configuration-options
 
     image: 'bitnami/kafka:3.5.1'
-    hostname: kafka0.local
+    hostname: kafka0.vLocal
     container_name: kafka0
     restart: always
     environment:
@@ -101,7 +101,7 @@ services:
       - GARMIN_network
   kafka1:
     image: 'bitnami/kafka:3.5.1'
-    hostname: kafka1.local
+    hostname: kafka1.vLocal
     container_name: kafka1
     restart: always
     environment:
@@ -117,7 +117,7 @@ services:
       - GARMIN_network
   kafka2:
     image: 'bitnami/kafka:3.5.1'
-    hostname: kafka2.local
+    hostname: kafka2.vLocal
     container_name: kafka2
     restart: always
     environment:
@@ -142,7 +142,7 @@ services:
 
     image: bitnami/prometheus:2.52.0
     container_name: prometheus
-    hostname: prometheus.local
+    hostname: prometheus.vLocal
     restart: unless-stopped
     environment:
       - TZ=Asia/Taipei
@@ -169,7 +169,7 @@ services:
 
     image: grafana/grafana:10.4.3-ubuntu
     container_name: grafana
-    hostname: grafana.local
+    hostname: grafana.vLocal
     restart: unless-stopped
     environment:
       - TZ=Asia/Taipei
