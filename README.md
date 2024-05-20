@@ -32,7 +32,7 @@ iv.
 3 個 app server 組成一個 kafka consumer group, 精確分配 kafka partition.
 
 v.  
-produce evnet 加上 kafka key, 每筆特定的資料, 只會有單一消費者處理. 當多個消費者處理資料時, 也可以保證 message 的順序.
+produce event 加上 kafka key, 每筆特定的資料, 只會有單一消費者處理. 當多個消費者處理資料時, 也可以保證 message 的順序.
 
 vi.
 
