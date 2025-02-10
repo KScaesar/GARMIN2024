@@ -152,6 +152,7 @@ services:
       - prometheus_data:/opt/bitnami/prometheus/data
       - ./prometheus.yml:/opt/bitnami/prometheus/conf/prometheus.yml
     command:
+      - "--config.file=/opt/bitnami/prometheus/conf/prometheus.yml"
       - "--storage.tsdb.retention.time=7d"   # 保留 7 天數據
       - "--storage.tsdb.retention.size=50GB"  # 限制數據佔用 50GB 空間
 
